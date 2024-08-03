@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.env
+
+# Files
+*.mp4
+*.avi
+*.mov
+*.mp3
+*.wav
+*.flac
