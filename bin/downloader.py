@@ -2,7 +2,6 @@ import os
 import logging
 from yt_dlp import YoutubeDL
 
-
 class Downloader:
     def __init__(self, download_dir="../data/downloads"):
         self.download_dir = download_dir
@@ -16,8 +15,6 @@ class Downloader:
         }
 
     def search_yt(self, item, extension='mp3', progress_callback=None):
-        self.YDL_OPTIONS['outtmpl'] = os.path.join(self.download_dir, f'downloaded_audio.{extension}')
-        
         def progress_hook(d):
             if progress_callback:
                 progress_callback(d['status'], d.get('downloaded_bytes', 0), d.get('total_bytes', 0))
@@ -26,7 +23,7 @@ class Downloader:
         
         with YoutubeDL(self.YDL_OPTIONS) as ydl:
             try:
-                info = ydl.extract_info(f"ytsearch:{item}", download=True)['entries'][0]
+                info = ydl.extract_info(f"ytsearch:{item}")['entries'][0]
             except Exception as e:
                 logging.error(f"Error occurred while extracting info from YouTube: {e}")
                 return False
@@ -41,7 +38,20 @@ class Downloader:
             logging.error("No audio format found for the given video")
             return False
         
-        return {'source': audio_url, 'title': info['title']}
+        # Update outtmpl with the video's title
+        title = info['title']
+        sanitized_title = "".join([c if c.isalnum() else "_" for c in title])
+        self.YDL_OPTIONS['outtmpl'] = os.path.join(self.download_dir, f'{sanitized_title}.{extension}')
+        
+        # Re-download with the updated outtmpl
+        with YoutubeDL(self.YDL_OPTIONS) as ydl:
+            try:
+                ydl.download([audio_url])
+            except Exception as e:
+                logging.error(f"Error occurred while downloading the audio: {e}")
+                return False
+        
+        return {'source': audio_url, 'title': title}
     
     def get_file(self, url, title, extension='mp3'):
         os.system(f"ffmpeg -i {url} -vn -ab 128k -ar 44100 -y {title}.{extension}")

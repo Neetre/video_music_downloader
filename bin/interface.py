@@ -1,6 +1,6 @@
 import gradio as gr
-import asyncio
 from downloader import Downloader
+
 
 def search(url, ext, progress=gr.Progress()):
     down = Downloader()
@@ -32,6 +32,7 @@ def interface():
         submit_btn.click(on_submit, inputs=[url, ext], outputs=[download_btn, output_file])
 
     demo.launch(inbrowser=True)
+
 
 if __name__ == "__main__":
     interface()

@@ -1,5 +1,8 @@
+# Dirs
 .venv/
 __pycache__/
+
+# Files
 .env
 
 # Files
@@ -9,3 +12,4 @@ __pycache__/
 *.mp3
 *.wav
 *.flac
+*.webm
