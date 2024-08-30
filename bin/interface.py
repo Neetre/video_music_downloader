@@ -1,6 +1,6 @@
 import gradio as gr
+import asyncio
 from downloader import Downloader
-
 
 def search(url, ext, progress=gr.Progress()):
     down = Downloader()
@@ -22,17 +22,15 @@ def interface():
         ext = gr.Dropdown(["mp3", "wav", "mp4"], label="Choose the type to convert into")
         submit_btn = gr.Button("Submit")
         progress_bar = gr.Progress()
-        download_btn = gr.Button("Download", interactive=False)
         output_file = gr.File(label="Converted file")
 
         def on_submit(url, ext):
             file_path = search(url, ext, progress_bar)
-            return {download_btn: gr.Button(interactive=True), output_file: file_path}
+            return output_file.update(value=file_path)
 
-        submit_btn.click(on_submit, inputs=[url, ext], outputs=[download_btn, output_file])
+        submit_btn.click(on_submit, inputs=[url, ext], outputs=[output_file])
 
     demo.launch(inbrowser=True)
-
 
 if __name__ == "__main__":
     interface()
